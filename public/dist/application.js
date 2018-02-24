@@ -108,6 +108,11 @@ ApplicationConfiguration.registerModule('events');
 'use strict';
 
 // Use Applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('feedbacks');
+
+'use strict';
+
+// Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('patients');
 
 'use strict';
@@ -805,6 +810,9 @@ eventCreateApp.controller('EventsCreateController',
                 var endDate = new Date($scope.event.startDate);
                 endDate.setHours(23, 59, 59, 999);
 
+                var slotArr = [];
+                // var selectedEventArray = [];
+
                 for (var index = 0; index < this.selectedDentist.slots.length; index++) {
 
                     var slot = this.selectedDentist.slots[index];
@@ -812,6 +820,8 @@ eventCreateApp.controller('EventsCreateController',
                     $scope.event.minTime = $filter('date')(new Date(slot.starttime), 'shortTime');
                     $scope.event.maxTime = $filter('date')(new Date(slot.endtime), 'shortTime');
                     $scope.event.step = this.selectedTreatment.duration;
+
+                    slotArr.push({ 'minTime': $scope.event.minTime, 'maxTime': $scope.event.maxTime })
 
                     if (slot.day === _date) {
                         $googleCalendar.getEventByUser(this.selectedDentist, startDate, endDate)
@@ -825,29 +835,69 @@ eventCreateApp.controller('EventsCreateController',
                                     event.push(new Date(element.end.dateTime).toLocaleTimeString());
                                     eventArray.push(event);
                                 }, this);
+                                console.log(slotArr)
+                                // if (slotArr.length > 1) {
+                                // eventArray.push(slotArr[0].maxTime);
+                                // eventArray.push(slotArr[slotArr.length - 1].minTime);
 
-                                $(document).ready(function () {
-                                    $('#timePick').timepicker({
-                                        'minTime': $scope.event.minTime,
-                                        'maxTime': $scope.event.maxTime,
-                                        'step': '15',
-                                        // 'step': function (i) {
-                                        //     return (i % 2) ? 15 : 15;
-                                        // },
-                                        'disableTextInput': true,
-                                        'timeFormat': 'g:ia',
-                                        'disableTimeRanges': eventArray
+                                // var startSlotTime = slotArr[0].minTime;
+                                // var endSlotTime = slotArr[slotArr.length - 1].maxTime;
+                                // }
+                                // else {
+                                // eventArray.push(slotArr[0].maxTime);
+                                // eventArray.push(slotArr[0].minTime);
+
+                                // var startSlotTime = slotArr[0].minTime;
+                                // var endSlotTime = slotArr[0].maxTime;
+                                // }
+
+
+                                for (var i = 0; i < slotArr.length; i++) {
+                                    if (slotArr.length > 1) {
+
+                                        var st = slotArr[0].maxTime;
+                                        var ed = slotArr[slotArr.length - 1].minTime;
+
+                                        console.log(st, ed);
+
+                                        var datSE = [st, ed];
+
+                                        console.log(datSE);
+
+                                        eventArray.push(datSE);
+                                        // eventArray.push(slotArr[slotArr.length - 1].minTime);
+
+                                        var startSlotTime = slotArr[0].minTime;
+                                        var endSlotTime = ed;
+                                    }
+                                    else {
+                                        eventArray.push(slotArr[0].maxTime);
+                                        eventArray.push(slotArr[0].minTime);
+                                    }
+                                }
+
+                                        $(document).ready(function () {
+                                            $('#timePick').timepicker({
+                                                'minTime': startSlotTime,
+                                                'maxTime': endSlotTime,
+                                                'step': '15',
+                                                // 'step': function (i) {
+                                                // return (i % 2) ? 15 : 15;
+                                                // },
+                                                'disableTextInput': true,
+                                                'timeFormat': 'g:ia',
+                                                'disableTimeRanges': eventArray //[['1:30pm', '5pm']] //eventArray
+                                            });
+
+
+                                        });
                                     });
 
-
-                                });
-                            });
-
                         $scope.notavailable = '';
-                        break;
+                        // break;
                     }
                     else {
-                        $scope.notavailable = 'No Slots Available for the selected date';   //$scope.notavailable = '';
+                        $scope.notavailable = 'No Slots Available for the selected date'; //$scope.notavailable = '';
                     }
                 }
             };
@@ -1102,6 +1152,7 @@ eventsApp.controller('EventsController', ['$scope', '$googleCalendar', '$uibModa
                 }
 
             });
+            console.log($googleCalendar);
         };
 
         $scope.eventSources = [$scope.calEvents];
@@ -1113,6 +1164,19 @@ eventsApp.controller('EventsController', ['$scope', '$googleCalendar', '$uibModa
         $scope.myFilter = function (event) {
             return event.description !== 'On Vacation';
         };
+
+       // delete events
+         $scope.remove=function(calendarId, eventId){
+            console.log(calendarId);
+                console.log(eventId);
+            //var currentId = id;
+            $googleCalendar.deleteEvent(calendarId, eventId).then(function () {
+                refresh();
+            });
+
+            //$scope.deleteEvent= id;
+		};
+        // delete ends
 
 
     }]);
@@ -1194,6 +1258,24 @@ angular.module('GoogleCalendarService', [], ["$provide", function ($provide) {
 
 				return defer.promise;
 			},
+            
+			// delete events
+				deleteEvent: function (eventId) {
+				var defer = $q.defer();
+
+				$http.delete(baseUrl + '/api/events/'+ eventId.id).then(function (response) {
+					if (response.status === 200) {
+						defer.resolve(response);
+					} else {
+						$scope.$broadcast('GoogleError', response.data);
+						defer.reject(response);
+					}			
+				});
+				return defer.promise;
+			},
+			// delete events end
+
+
 			addEvent: function (scheduledDate, endDate, contactInfo, patientInfo) {
 				var defer = $q.defer();
 				
@@ -1248,6 +1330,175 @@ angular.module('GoogleCalendarService', [], ["$provide", function ($provide) {
 	}]);
 
 }]);
+'use strict';
+
+// Configuring the Patients module
+angular.module('feedbacks',['multipleSelect','mgcrea.ngStrap', 'ngMaterial', 'ui.bootstrap']).run(['Menus',
+  function (Menus) {
+    // Add the patients dropdown item
+    Menus.addMenuItem('topbar', {
+      title: 'feedback Form',
+      state: 'feedbacks.main',
+    });
+  }
+]);
+
+'use strict';
+
+// Setting up route
+angular.module('feedbacks').config(['$stateProvider',
+  function ($stateProvider) {
+    // Patients state routing
+    $stateProvider
+      .state('feedbacks', {
+        abstract: true,
+        url: '/feedbacks',
+        template: '<ui-view/>',
+        data: {
+          roles: ['user', 'admin']
+        }
+      })
+      .state('feedbacks.main', {
+        url: '/main',
+        templateUrl: 'modules/feedbacks/views/list-feedbacks.client.view.html'
+      })
+    //   .state('events.list', {
+    //     templateUrl: 'modules/events/views/list-events.client.view.html'
+    //   })
+    //   .state('events.calendar', {
+    //     templateUrl: 'modules/events/views/calendar-events.client.view.html'
+    //   })
+    //   .state('events.create', {
+    //     url: '/createappointment',
+    //     templateUrl: 'modules/events/views/create-events.client.view.html'
+    //   });
+  }
+]);
+
+'use strict';
+
+var feedbacksApp = angular.module('feedbacks');
+
+feedbacksApp.controller('FeedbacksController', ['$scope', 'Feedbacks',
+    function($scope, Feedbacks) {
+
+        $scope.feedbackList = [];
+        $scope.feedback = [];
+        $scope.disabled = false;
+
+        var refresh = function() {
+            $scope.feedbackList = Feedbacks.query();
+            $scope.feedback = [];
+            $scope.disabled = false;
+        };
+
+        refresh();
+
+        // Create new Appt Type
+        $scope.addFeedback = function() {
+
+            // Create new Appt Type object
+            var feedback = new Feedbacks({
+                 patName: $scope.feedback.patName,
+                feedbackHyegine: $scope.feedback.feedbackHyegine,
+                feedbackAmbience: $scope.feedback.feedbackAmbience,
+                feedbackExperience: $scope.feedback.feedbackExperience,
+                 feedbackHandling: $scope.feedback.feedbackHandling,
+                  feedbackManners: $scope.feedback.feedbackManners,
+                   feedbackCommunication: $scope.feedback.feedbackCommunication,
+               
+
+            });
+ console.log(feedback);
+            // Redirect after save
+            feedback.$save(function(response) {
+
+                // Clear form fields
+                $scope.feedback.patNmae = '';
+                $scope.feedback.feedbackHyegine = '';
+                $scope.feedback.feedbackAmbience = '';
+                $scope.feedback.feedbackExperience = '';
+                $scope.feedback.feedbackExHandling = '';
+                $scope.feedback.feedbackManners = '';
+                $scope.feedback.feedbackCommunication = '';
+
+                refresh();
+
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
+        };
+
+        // Remove existing procedure
+        $scope.remove = function(feedback) {
+            if (confirm('Are you sure you want to delete this feedback?')) {
+                if (feedback) {
+
+                    feedback.$remove();
+
+                    for (var i in this.feedbackList) {
+                        if (this.feedbackList[i] === feedback) {
+                            this.feedbackList.splice(i, 1);
+                        }
+                    }
+                } else {
+                    this.feedback.$remove(function() {
+
+                    });
+                }
+            }
+        };
+
+        // Update existing Personal
+        $scope.update = function(updtfeedback) {
+
+            var feedback = updtfeedback;
+
+            feedback.$update(function() {
+                refresh();
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+                console.log(errorResponse.data.message);
+            });
+        };
+
+        $scope.edit = function(feedback) {
+
+            for (var i in this.feedbackList) {
+                if (this.feedbackList[i] === feedback) {
+                    $scope.feedback = feedback;
+                }
+            }
+
+            $scope.disabled = true;
+        };
+
+        $scope.deselect = function() {
+            $scope.feedback = [];
+            $scope.disabled = false;
+        };
+
+    }
+]);
+
+'use strict';
+
+angular.module('feedbacks')
+
+    //Patients service used for communicating with the patients REST endpoints
+
+    .factory('Feedbacks', ['$resource',
+        function($resource) {
+            return $resource('api/feedbacks/:feedbackId', {
+                feedbackId: '@_id'
+            }, {
+                    update: {
+                        method: 'PUT'
+                    }
+                });
+        }
+    ])
+
 'use strict';
 
 // Configuring the Patients module
