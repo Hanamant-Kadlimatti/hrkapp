@@ -1,0 +1,108 @@
+
+<section class="container" data-ng-controller="FeedbacksController" ng-init="showData()">
+    <br>
+    <table class="table table-hover table-responsive table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Hyegine</th>
+                 <th>Ambience</th>               
+                <th>Experience</th>
+                <th>Patient Handling</th>
+                <th>Chairside Manners</th>
+                <th>Dr Communication</th>
+                <th>Action</th>
+               <!-- <th>Contact</th>
+                <th>Email</th>
+                <th>Medical Condition</th>
+                <th>Chief Complaint</th>-->
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                 <td>
+                     <input type="text" class"form-control" ng-model="feedback.patName">
+                 </td>
+                <td><label>Hyegine in the clinic </label><br>
+                    <md-input-container class="hyegine" >
+                    <md-radio-group layout="column" id="feedbackHyegineid" name="feedbackHyegine" ng-model="feedback.feedbackHyegine">
+                    <md-radio-button value="Excellent" class="text-muted"><b>Excellent</b></md-radio-button>
+                    <md-radio-button value="Good" class="text-muted"><b>Good</b></md-radio-button>
+                    <md-radio-button value="Average" class="text-muted"><b>Average</b></md-radio-button>
+                    <md-radio-button value="Poor" class="text-muted"><b>Poor</b></md-radio-button>
+                   </md-radio-group>
+                   </md-input-container>
+                </td>
+                <td><label>Ambience of the clinic </label><br>
+                    <md-input-container class="" >
+                    <md-radio-group layout="column" id="feedbackAmbienceid" name="feedbackAmbience" ng-model="feedback.feedbackAmbience">
+                        
+                    <md-radio-button value="Excellent" class="text-muted"><b>Excellent</b></md-radio-button>
+                    <md-radio-button value="Good" class="text-muted"><b>Good</b></md-radio-button>
+                    <md-radio-button value="Average" class="text-muted"><b>Average</b></md-radio-button>
+                    <md-radio-button value="Poor" class="text-muted"><b>Poor</b></md-radio-button>
+                   </md-radio-group>
+                   </md-input-container>
+                </td>
+                <td><label>Your experience at the reception </label><br>
+                    <md-input-container class="" >
+                    <md-radio-group layout="column" id="feedbackExperienceid" name="feedbackExperience" ng-model="feedback.feedbackExperience">
+                        
+                    <md-radio-button value="Excellent" class="text-muted"><b>Excellent</b></md-radio-button>
+                    <md-radio-button value="Good" class="text-muted"><b>Good</b></md-radio-button>
+                    <md-radio-button value="Average" class="text-muted"><b>Average</b></md-radio-button>
+                    <md-radio-button value="Poor" class="text-muted"><b>Poor</b></md-radio-button>
+                   </md-radio-group>
+                   </md-input-container>
+                </td>
+                 <td><label>Patient Handling </label><br>
+                    <md-input-container class="" >
+                    <md-radio-group layout="column" id="feedbackHandlingid" name="feedbackHandling" ng-model="feedback.feedbackHandling">   
+                    <md-radio-button value="Excellent" class="text-muted"><b>Excellent</b></md-radio-button>
+                    <md-radio-button value="Good" class="text-muted"><b>Good</b></md-radio-button>
+                    <md-radio-button value="Average" class="text-muted"><b>Average</b></md-radio-button>
+                    <md-radio-button value="Poor" class="text-muted"><b>Poor</b></md-radio-button>
+                   </md-radio-group>
+                   </md-input-container>
+                </td>
+                 <td><label>ChairSide Manners </label><br>
+                    <md-input-container class="" >
+                    <md-radio-group layout="column" id="feedbackMannersid" name="feedbackManners" ng-model="feedback.feedbackManners">
+                    <md-radio-button value="Excellent" class="text-muted"><b>Excellent</b></md-radio-button>
+                    <md-radio-button value="Good" class="text-muted"><b>Good</b></md-radio-button>
+                    <md-radio-button value="Average" class="text-muted"><b>Average</b></md-radio-button>
+                    <md-radio-button value="Poor" class="text-muted"><b>Poor</b></md-radio-button>
+                   </md-radio-group>
+                   </md-input-container>
+                </td>
+                 <td><label>Communication Ability </label><br>
+                    <md-input-container class="" >
+                    <md-radio-group layout="column" id="feedbackCommunicationid" name="feedbackCommunication" ng-model="feedback.feedbackCommunication">
+                    <md-radio-button value="Excellent" class="text-muted"><b>Excellent</b></md-radio-button>
+                    <md-radio-button value="Good" class="text-muted"><b>Good</b></md-radio-button>
+                    <md-radio-button value="Average" class="text-muted"><b>Average</b></md-radio-button>
+                    <md-radio-button value="Poor" class="text-muted"><b>Poor</b></md-radio-button>
+                   </md-radio-group>
+                   </md-input-container>
+                </td>
+                 <td>
+                        <button class="btn btn-primary" ng-click="addFeedback()" ng-disabled="disabled"><i class="glyphicon glyphicon-plus"></i></button>
+                    </td>
+            </tr>
+
+             <tr data-ng-repeat="feedback in feedbackList">
+                 <td>{{feedback.patName}}</td>
+                    <td>{{feedback.feedbackHyegine}}</td>
+                    <td>{{feedback.feedbackAmbience}}</td>
+                    <td>{{feedback.feedbackExperience}}</td>
+                    <td>{{feedback.feedbackHandling}}</td>
+                    <td>{{feedback.feedbackManners}}</td>
+                    <td>{{feedback.feedbackCommunication}}</td>
+                </tr>
+        </tbody>
+    </table>
+
+     <!--<ul uib-pagination class="pull-right" total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage"></ul uib-pagination>-->
+   
+</section>
